@@ -1,0 +1,77 @@
+About the program:
+Opus8 was written in Pascal and compiled with the PCQ PD compiler. I am a big
+Bloom County fan, so that's where I got the name. It is easy to use. All you do
+is type "Opus8 <MacSound> <IFF sound> <Hz>". Then just run the sounds with
+your favorite sound player.
+
+About the frequency:
+Typically, Macintosh sounds are sampled at four frequencies. They are :
+    22.2 kHz
+    11.1 kHz
+     7.2 kHz
+     5.7 kHz.
+Rarely will you find a sound sampled at another rate.
+
+About the sound examples:
+I used a friend's SuperDrive to copy the examples to MS-DOS then Dos-2-Dos to
+get them on my Amiga. Here are the frequencies so you can convert them
+yourself:
+	    Pig-Ignorance.mac	      11100 Hz
+	    HAL.Sorry.mac	      11100 Hz
+If you want more sounds I have a few more disks of them just drop me a
+letter (and a little cash:disks, mailers, postage[More than three bucks
+will be dandy.]) and I'll send some along. There are Monty Python sounds,
+Doctor Who sounds, 2001 sounds, Bodily Functions, Song Clips, etc.
+
+About the problems:
+IF you hear a pop at the beginning of the converted sound, you probably
+downloaded the sound, or that is the way the sound is. My program does not
+yet strip the DeskTop info off the file, and probably will not. Stuff
+copied with the Apple SuperDrive will be perfectly fine. Though I am not
+sure about Mac-2-DOS, but I will find out.
+
+Also, do not make Opus8 resident and then run it with sounds on the RAM DISK.
+I have not got the foggiest idea why it doesn't work, but it will run and then
+the IFF sound cannot be found by any program, but it does show up on Dir and
+List. Why, I hear you ask. I do not know. So don't do it.
+
+Donations:
+Donations will be graciously accepted. I will send you more sounds and any
+upgrades I make. I also need a harddrive. Please help.
+
+Distrubution:
+You may distribute this as long as you keep these files together. You may
+put this program in your PD collection as long as you do not charge more
+than $5 for the disk it is on. It is my program, I wrote it, I make the
+rules for it. Capice(?)?
+
+For the future:
+A Workbench interface. Amiga to Mac. IBM AdLib sounds. Using the memory a
+little bit better.
+
+Running on the Amiga 3000:
+This program works fine on the 3000, but the disk drive slows it down. The
+program reads and converts 1K blocks but that might change in the future.
+
+Thanks:
+Thanks go out to Kerry and Ian for the Mac sounds. One for Mark for the use
+of his Mac IIsi. To Patrick Quaid for the help with the program and for
+the compiler. To Ken for the use of his Amiga 3000, and for scanning the
+pictures for the icon. And to Rebecca for being so nice. Thanks.
+
+About the author:
+My name is John Safranek. I am a Leo. I am a Senior in high school. I've had a
+year a BASIC and a Semester and a half of Pascal in school. And blowing my own
+horn: this is a great first program. Thank you.
+
+Address: NOTE this address will change in June 1992. I graduate.
+
+		     John A. Safranek
+		     c/o Maj NJ Safranek
+		     2nd General Hospital
+		     CMR-402 Box 770
+		     APO, AE  09180
+
+November 23, 1991
+
+Register to VOTE. Zappa  '92.
