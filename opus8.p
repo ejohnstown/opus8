@@ -183,4 +183,10 @@ BEGIN {Main Program}
   END;  {WHILE..DO}
   WRITELN;
   WRITELN('Done. Thanks for making a small program happy.');
+
+  Close(InFile);
+  Close(OutFile);
+  FreeString(InFileName);
+  FreeString(OutFileName);
+
 END.  {Main Program}
