@@ -4,20 +4,20 @@ program Opus8;
 
 
 
-{$i "Include:Utils/StringLib.i"}
-{$i "Include:Utils/Parameters.i"}
-{$i "Include:Libraries/DOS.i"}
+{$I "Include:Utils/StringLib.i"}
+{$I "Include:Utils/Parameters.i"}
+{$I "Include:Libraries/DOS.i"}
 
 
 
 const
   singleOctave = 1;
   compressionNone = 0;
-  maxVolume = 0x10000;
-  tagForm = ;
-  tagVhdr = ;
-  tag8svx = ;
-  tagBody = ;
+  maxVolume = $10000;
+  tagForm = $464f524d;
+  tagVhdr = $56484452;
+  tag8svx = $38535658;
+  tagBody = $424f4459;
 
 
 type
@@ -41,7 +41,7 @@ type
 var
   srcName, destName: string;
   srcFile, destFile: text;
-  Hz          : short;
+  freq        : short;
   MacLength   : integer;
   success     : boolean;
   SampleChunk : array [1..1000] of byte;
@@ -60,30 +60,30 @@ procedure Usage();
 
 
 
-function GetHz(B : short) : integer;
+{ converts ascii string to a signed integer in base 10 }
+function atoi10(s : string) : integer;
 var
-  Noombah    : string;
   Multiplier : integer;
   Numb       : integer;
   Counter    : short;
+  sign       : integer;
 begin
   Multiplier := 1;
   Numb := 0;
   Counter := 4;
-  Noombah := AllocString(6);
-  GetParam(B, Noombah);
-  if Noombah[0] = CHR(0)
-    then Usage;
+  if s[0] = '-'
+    then sign := -1;
+	else sign := 1;
+
   for Counter := 4 downto 0 do
-    begin
-      if Noombah[Counter] > chr(0) then
-        begin
-          Numb := Numb + ((ord(Noombah[Counter]) - 48) * Multiplier);
+  begin
+      if s[Counter] > chr(0) then
+      begin
+          Numb := Numb + ((ord(s[Counter]) - 48) * Multiplier);
           Multiplier := Multiplier * 10;
-        end;
-    end;
-  FreeString(Noombah);
-  GetHz := Numb;
+      end;
+  end;
+  atoi10 := Numb;
 end;
 
 
@@ -111,6 +111,7 @@ function FileSize(FileName: string): integer;
 
 
 
+{ translates an integer to a flat array }
 procedure c32toa(c : integer;
                  VAR Fin : SArray);
 VAR
@@ -151,17 +152,21 @@ end;
 
 begin
 
-  srcName := AllocString(80);
-  destName := AllocString(80);
+  srcName := AllocString(256);
+  destName := AllocString(256);
+  sndFreq := AllocString(256);
 
   GetParam(1, srcName);
   if srcName[0] = chr(0) then Usage;
 
   GetParam(2, destName);
-  if OutFileName[0] = chr(0) then Usage;
+  if destName[0] = chr(0) then Usage;
 
-  Hz := GetHz(3);
-  MacLength := FileSize(InFileName);
+  GetParam(3, sndFreq);
+  if sndFreq[0] = chr(0) then Usage;
+  freq := atoi10(sndFreq);
+
+  MacLength := FileSize(srcName);
 
   success := ReOpen(InFileName, InFile);
   if not success then
@@ -177,7 +182,7 @@ begin
 	  exit(5);
 	end;
 
-  WriteTheHeader(Hz, MacLength);
+  WriteTheHeader(freq, MacLength);
 
   while MacLength > 0 do
     begin
