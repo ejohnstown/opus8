@@ -25,7 +25,7 @@ type
   ChunkHeader = record
       name: integer;
       size: integer;
-	end;
+  end;
   Voice8Header = record
       oneShotHiSamples: integer; { length of highest octave one-shot part }
       repeatHiSamples: integer; {length of highest octave repeat part }
@@ -34,29 +34,25 @@ type
       ctOctave: byte; { number of octaves of waveforms }
       sCompression: byte; { 0 = none, 1 = FibDelta }
       volume: integer; { 0 = silent, 0x10000 = max }
-    end;
+  end;
 
 
 
 var
-  srcName, destName: string;
-  srcFile, destFile: text;
-  freq        : short;
-  MacLength   : integer;
-  success     : boolean;
-  SampleChunk : array [1..1000] of byte;
-  ASample,
-  ChunkLength,
-  CounterMain,
-  CounterAux  : short;
+  srcName, destName, sndFreq: string;
+  srcFile, destFile: FileHandle;
+  freq: short;
+  MacLength: integer;
+  error: boolean;
+  SampleChunk: array [1..1000] of byte;
+  ASample, ChunkLength, CounterMain, CounterAux: short;
 
 
 
 procedure Usage();
-  begin
+begin
     WriteLn('Usage: Opus8 src dest freq');
-    exit(5);
-  end;
+end;
 
 
 
@@ -71,9 +67,10 @@ begin
   Multiplier := 1;
   Numb := 0;
   Counter := 4;
-  if s[0] = '-'
-    then sign := -1;
-	else sign := 1;
+  if s[0] = '-' then
+    sign := -1
+  else
+    sign := 1;
 
   for Counter := 4 downto 0 do
   begin
@@ -100,10 +97,10 @@ function FileSize(FileName: string): integer;
     if fLock <> NIL
 	then
 	  begin
-        new(fInfo);
+        New(fInfo);
         if Examine(fLock, fInfo)
-        then fSz := fInfo^.fib_Size
-        dispose(fInfo);
+        then fSz := fInfo^.fib_Size;
+        Dispose(fInfo);
         UnLock(fLock);
       end;
     FileSize := fSz;
@@ -124,8 +121,8 @@ begin
 
   for index := 8 downto 1 do
     begin
-      Result[index] := Benign AND 15;
-      Benign := Benign div 16;
+      Result[index] := c AND 15;
+      c := c div 16;
     end;
 
   Count := 1;
@@ -139,51 +136,98 @@ end;
 
 
 
-procedure WriteTheHeader(bitRate: short;
-                         fileSz: integer);
+function HeapFunc(size : integer) : integer;
 begin
-  Write(OutFile, tagForm, Len, tag8svx, tagVhdr, CHR($00), CHR($00), CHR($00),
-  CHR($14), fileSz+40, CHR($00), CHR($00), CHR($00), CHR($00), CHR($00), CHR($00),
-  CHR($00), CHR($00), bitRate, CHR($01), CHR($00), CHR($00), CHR($01),
-  CHR($00), CHR($00), 'BODY', fileSz);
+  HeapFunc := 1;
 end;
 
 
 
+
 begin
+  error := false;
+  srcName := nil;
+  destName := nil;
+  sndFreq := nil;
+  srcFile := nil;
+  destFile := nil;
+  HeapError := @HeapFunc;
 
-  srcName := AllocString(256);
-  destName := AllocString(256);
-  sndFreq := AllocString(256);
+  if not error then
+  begin
+    srcName := AllocString(256);
+    if srcName = nil then error := true;
+  end;
 
-  GetParam(1, srcName);
-  if srcName[0] = chr(0) then Usage;
+  if not error then
+  begin
+    destName := AllocString(256);
+    if destName = nil then error := true;
+  end;
 
-  GetParam(2, destName);
-  if destName[0] = chr(0) then Usage;
+  if not error then
+  begin
+    sndFreq := AllocString(256);
+    if sndFreq = nil then error := true;
+  end;
 
-  GetParam(3, sndFreq);
-  if sndFreq[0] = chr(0) then Usage;
-  freq := atoi10(sndFreq);
+  if not error then
+  begin
+    GetParam(1, srcName);
+    if srcName[0] = chr(0) then
+	begin
+      Usage;
+      error := true;
+	end;
+  end;
 
-  MacLength := FileSize(srcName);
+  if not error then
+  begin
+    GetParam(2, destName);
+    if destName[0] = chr(0) then
+    begin
+      Usage;
+      error := true;
+    end;
+  end;
 
-  success := ReOpen(InFileName, InFile);
-  if not success then
+  if not error then
+  begin
+    GetParam(3, sndFreq);
+    if sndFreq[0] = chr(0) then
+    begin
+      Usage;
+      error := true;
+    end;
+  end;
+
+  if not error then
+  begin
+    freq := atoi10(sndFreq);
+    MacLength := FileSize(srcName);
+  end;
+
+  if not error then
+  begin
+    srcFile := DOSOpen(srcName, MODE_OLDFILE);
+    if srcFile = nil then
 	begin
       WriteLn('cannot open source file');
-	  exit(5);
+      error := true;
 	end;
+  end;
 
-  success := Open(OutFileName, OutFile);
-  if not success then
+  if not error then
+  begin
+    destFile := DOSOpen(destName, MODE_NEWFILE);
+    if destFile = nil then
     begin
       WriteLn('cannot create destination file');
-	  exit(5);
+      error := true;
 	end;
+  end;
 
-  WriteTheHeader(freq, MacLength);
-
+{
   while MacLength > 0 do
     begin
       ChunkLength := 1000;
@@ -211,10 +255,14 @@ begin
         Write(OutFile, SampleChunk[CounterAux]);
 
     end;
+}
 
-    Close(InFile);
-    Close(OutFile);
-    FreeString(InFileName);
-    FreeString(OutFileName);
+  if srcFile <> nil then DOSClose(srcFile);
+  if destFile <> nil then DOSClose(destFile);
+  if srcName <> nil then FreeString(srcName);
+  if destName <> nil then FreeString(destName);
+  if sndFreq <> nil then FreeString(sndFreq);
+
+  if error Exit(5);
 
 end.
